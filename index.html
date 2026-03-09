@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>marcthefennec</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+:root {
+  --p1:#b44fff;--p2:#7000c8;--p3:#4b0082;--p4:#2d004d;--p5:#1a002e;
+  --light:#f0e0ff;--mid:#d0a0f0;--accent:#ff80ff;--white:#fff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Press Start 2P',monospace;background-color:var(--p4);
+  background-image:radial-gradient(ellipse at 20% 50%,#4b008240 0%,transparent 60%),
+  radial-gradient(ellipse at 80% 20%,#7000c820 0%,transparent 50%),
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='1' height='1' fill='%23ffffff08'/%3E%3Crect width='1' height='1' x='2' y='2' fill='%23ffffff04'/%3E%3C/svg%3E");
+  min-height:100vh;overflow:hidden;user-select:none}
+.star{position:fixed;width:3px;height:3px;background:var(--accent);pointer-events:none;animation:twinkle 3s infinite}
+@keyframes twinkle{0%,100%{opacity:.1}50%{opacity:.7}}
+#desktop{position:fixed;inset:0;bottom:48px;padding:16px;display:flex;flex-direction:column;flex-wrap:wrap;align-content:flex-start;gap:8px}
+.icon{display:flex;flex-direction:column;align-items:center;gap:6px;width:72px;cursor:pointer;padding:4px;border:2px solid transparent}
+.icon:hover{border:2px dotted var(--accent);background:#9b30d920}
+.icon-img{font-size:32px;display:flex;align-items:center;justify-content:center;width:40px;height:40px}
+.icon span{font-size:7px;color:var(--white);text-align:center;line-height:1.4;text-shadow:1px 1px 0 #000,-1px 0 0 #000}
+.window{position:fixed;min-width:280px;border:2px solid var(--p1);
+  box-shadow:inset 1px 1px 0 #e0c0ff,inset -1px -1px 0 var(--p3),3px 3px 0 #00000080,0 0 0 1px var(--p3);
+  background:var(--light);display:none;z-index:10}
+.window.active{z-index:20}.window.open{display:block}
+.titlebar{background:linear-gradient(180deg,#c060ff 0%,#7000c8 45%,#5500a0 100%);
+  padding:5px 6px;display:flex;align-items:center;gap:6px;cursor:move;border-bottom:2px solid var(--p3)}
+.titlebar-title{font-size:8px;color:white;text-shadow:1px 1px 0 var(--p5);flex:1;white-space:nowrap;overflow:hidden}
+.titlebar-buttons{display:flex;gap:3px;flex-shrink:0}
+.tbtn{width:18px;height:16px;font-size:8px;border:1px solid;cursor:pointer;font-family:'Press Start 2P',monospace;display:flex;align-items:center;justify-content:center}
+.tbtn-min,.tbtn-max{background:linear-gradient(180deg,#e0c8ff,#9b50d9);border-color:#c080ff #6000a0 #6000a0 #c080ff;color:white}
+.tbtn-close{background:linear-gradient(180deg,#ff80c0,#cc0055);border-color:#ffb0d8 #880033 #880033 #ffb0d8;color:white}
+.tbtn:hover{filter:brightness(1.2)}.tbtn:active{filter:brightness(.85)}
+.win-menubar{background:var(--light);border-bottom:1px solid var(--mid);padding:2px 4px;display:flex;gap:2px}
+.win-menubar span{font-size:7px;padding:2px 6px;color:#1a001a;cursor:pointer}
+.win-menubar span:hover{background:var(--p2);color:white}
+.win-body{padding:14px;background:var(--light);overflow-y:auto;font-size:8px;color:#1a001a;line-height:1.8;max-height:60vh}
+.win-body::-webkit-scrollbar{width:14px}
+.win-body::-webkit-scrollbar-track{background:var(--mid)}
+.win-body::-webkit-scrollbar-thumb{background:var(--p2);border:2px solid var(--mid)}
+.win-statusbar{background:linear-gradient(180deg,#d8b8f8,#c090e8);border-top:1px solid var(--p3);padding:3px 8px;font-size:6px;color:var(--p5);display:flex;justify-content:space-between}
+.px-divider{height:4px;background:repeating-linear-gradient(90deg,var(--p2) 0 4px,transparent 4px 8px);margin:10px 0}
+.about-header{display:flex;gap:14px;align-items:flex-start;margin-bottom:12px}
+.avatar-box{width:64px;height:64px;flex-shrink:0;border:3px solid var(--p2);background:var(--p4);display:flex;align-items:center;justify-content:center;font-size:30px}
+.about-info h2{font-size:10px;color:var(--p2);margin-bottom:6px}
+.about-info p{font-size:7px;line-height:1.9}
+.tag-list{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.tag{font-size:6px;background:var(--p3);color:var(--accent);padding:3px 6px;border:1px solid var(--p1)}
+.project-item{border:2px solid var(--p2);background:white;padding:10px;margin-bottom:8px;margin-left:14px;position:relative}
+.project-item::before{content:'►';position:absolute;top:10px;left:-14px;font-size:8px;color:var(--p1)}
+.project-item h3{font-size:8px;color:var(--p2);margin-bottom:4px}
+.project-item p{font-size:7px;color:#555;line-height:1.7}
+.project-link{display:inline-block;margin-top:6px;font-size:6px;color:var(--p1);text-decoration:none;border-bottom:1px solid var(--p1);cursor:pointer}
+.project-link:hover{color:var(--accent);border-color:var(--accent)}
+.update-item{padding:6px 0;border-bottom:1px dashed var(--mid);font-size:7px;display:flex;gap:8px}
+.update-date{color:var(--p2);white-space:nowrap;flex-shrink:0}
+.contact-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--mid);font-size:7px}
+.contact-icon{font-size:18px;flex-shrink:0}
+.contact-info a{color:var(--p2);text-decoration:none}
+.contact-info a:hover{color:var(--accent)}
+.contact-label{font-size:6px;color:#888;margin-bottom:3px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.blink{animation:blink 1s step-start infinite}
+#taskbar{position:fixed;bottom:0;left:0;right:0;height:48px;background:linear-gradient(180deg,#9b40e8 0%,#4b0082 40%,#3d006e 100%);border-top:2px solid var(--p1);display:flex;align-items:center;gap:4px;padding:0 6px;z-index:100}
+#start-btn{height:36px;padding:0 10px;background:linear-gradient(180deg,#c060ff 0%,#7000c8 50%,#5000a0 100%);border:2px solid;border-color:#e0a0ff #3d006e #3d006e #e0a0ff;color:white;font-family:'Press Start 2P',monospace;font-size:8px;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap}
+#start-btn:hover{filter:brightness(1.15)}
+.taskbar-sep{width:2px;height:32px;background:linear-gradient(180deg,transparent,var(--p1),transparent);margin:0 2px}
+.task-btn{height:32px;padding:0 8px;background:linear-gradient(180deg,#9b30d9 0%,#6000b0 100%);border:1px solid;border-color:#c080ff #3d006e #3d006e #c080ff;color:white;font-family:'Press Start 2P',monospace;font-size:6px;cursor:pointer;white-space:nowrap;display:none}
+.task-btn.visible{display:block}
+.task-btn:hover{filter:brightness(1.2)}
+.task-btn.active-task{background:linear-gradient(180deg,#5000a0,#8a20d0)}
+#taskbar-clock{margin-left:auto;background:#2d004d;border:1px solid var(--p3);padding:4px 10px;font-size:7px;color:var(--accent);min-width:90px;text-align:center}
+#start-menu{position:fixed;bottom:48px;left:0;width:220px;background:var(--p4);border:2px solid var(--p1);box-shadow:3px 3px 0 #000;display:none;z-index:200}
+#start-menu.open{display:block}
+.sm-header{background:linear-gradient(180deg,var(--p1),var(--p3));padding:12px 10px;display:flex;align-items:center;gap:10px}
+.sm-avatar{font-size:28px}.sm-name{font-size:9px;color:white;text-shadow:1px 1px 0 #000}
+.sm-items{padding:6px 0}
+.sm-item{display:flex;align-items:center;gap:8px;padding:8px 12px;font-size:7px;color:var(--light);cursor:pointer}
+.sm-item:hover{background:var(--p2);color:white}
+.sm-item-icon{font-size:16px;width:20px;text-align:center}
+.sm-sep{height:1px;background:var(--p3);margin:4px 8px}
+</style>
+</head>
+<body>
+
+<div class="star" style="top:8%;left:5%;animation-delay:0s"></div>
+<div class="star" style="top:15%;left:25%;animation-delay:.5s"></div>
+<div class="star" style="top:30%;left:70%;animation-delay:1s"></div>
+<div class="star" style="top:60%;left:90%;animation-delay:.2s"></div>
+<div class="star" style="top:75%;left:40%;animation-delay:1.5s"></div>
+<div class="star" style="top:5%;left:80%;animation-delay:.8s"></div>
+<div class="star" style="top:50%;left:15%;animation-delay:2s"></div>
+<div class="star" style="top:85%;left:60%;animation-delay:.3s"></div>
+<div class="star" style="top:40%;left:55%;animation-delay:1.2s"></div>
+<div class="star" style="top:20%;left:45%;animation-delay:.7s"></div>
+
+<div id="desktop">
+  <div class="icon" onclick="openWindow('about')"><div class="icon-img">🦊</div><span>Sobre mi</span></div>
+  <div class="icon" onclick="openWindow('projects')"><div class="icon-img">📁</div><span>Proyectos</span></div>
+  <div class="icon" onclick="openWindow('updates')"><div class="icon-img">📰</div><span>Updates</span></div>
+  <div class="icon" onclick="openWindow('blog')"><div class="icon-img">📝</div><span>Blog</span></div>
+  <div class="icon" onclick="openWindow('contact')"><div class="icon-img">✉️</div><span>Contacto</span></div>
+</div>
+
+<!-- SOBRE MI -->
+<div class="window" id="win-about" style="top:60px;left:80px;width:420px;">
+  <div class="titlebar" onmousedown="startDrag(event,'about')">
+    <span style="font-size:14px">🦊</span>
+    <span class="titlebar-title">Sobre mi — marcthefennec</span>
+    <div class="titlebar-buttons">
+      <button class="tbtn tbtn-min" onclick="minimizeWindow('about')">_</button>
+      <button class="tbtn tbtn-max">□</button>
+      <button class="tbtn tbtn-close" onclick="closeWindow('about')">✕</button>
+    </div>
+  </div>
+  <div class="win-menubar"><span>Archivo</span><span>Ver</span><span>Ayuda</span></div>
+  <div class="win-body">
+    <div class="about-header">
+      <div class="avatar-box">🦊</div>
+      <div class="about-info">
+        <h2>marcthefennec</h2>
+        <!-- EDITA AQUI TU DESCRIPCION -->
+        <p>Hola! Soy marc, bienvenid@<br>a mi espacio</p>
+        <p style="margin-top:6px;">xd<br>q</p>
+      </div>
+    </div>
+    <div class="px-divider"></div>
+    <!-- EDITA TUS TAGS AQUI -->
+    <div class="tag-list">
+      <span class="tag">🎮 gaming</span>
+      <span class="tag">💜 purple</span>
+      <span class="tag">🖥 retro</span>
+    </div>
+    <div class="px-divider"></div>
+    <p style="font-size:7px;">Estado: <span class="blink" style="color:#9b30d9;">● online</span></p>
+  </div>
+  <div class="win-statusbar"><span>marcthefennec</span><span>Listo</span></div>
+</div>
+
+<!-- PROYECTOS -->
+<div class="window" id="win-projects" style="top:80px;left:180px;width:440px;">
+  <div class="titlebar" onmousedown="startDrag(event,'projects')">
+    <span style="font-size:14px">📁</span>
+    <span class="titlebar-title">Proyectos — marcthefennec</span>
+    <div class="titlebar-buttons">
+      <button class="tbtn tbtn-min" onclick="minimizeWindow('projects')">_</button>
+      <button class="tbtn tbtn-max">□</button>
+      <button class="tbtn tbtn-close" onclick="closeWindow('projects')">✕</button>
+    </div>
+  </div>
+  <div class="win-menubar"><span>Archivo</span><span>Editar</span><span>Ver</span></div>
+  <div class="win-body" id="projects-body"><p style="font-size:7px;color:#888;">Cargando...</p></div>
+  <div class="win-statusbar"><span id="projects-count">—</span><span>data/projects.json</span></div>
+</div>
+
+<!-- UPDATES -->
+<div class="window" id="win-updates" style="top:100px;left:280px;width:360px;">
+  <div class="titlebar" onmousedown="startDrag(event,'updates')">
+    <span style="font-size:14px">📰</span>
+    <span class="titlebar-title">Updates — marcthefennec</span>
+    <div class="titlebar-buttons">
+      <button class="tbtn tbtn-min" onclick="minimizeWindow('updates')">_</button>
+      <button class="tbtn tbtn-max">□</button>
+      <button class="tbtn tbtn-close" onclick="closeWindow('updates')">✕</button>
+    </div>
+  </div>
+  <div class="win-menubar"><span>Feed</span><span>Ver</span></div>
+  <div class="win-body" id="news-body"><p style="font-size:7px;color:#888;">Cargando...</p></div>
+  <div class="win-statusbar"><span id="news-count">—</span><span id="upd-time"></span></div>
+</div>
+
+<!-- CONTACTO -->
+<div class="window" id="win-contact" style="top:120px;left:380px;width:320px;">
+  <div class="titlebar" onmousedown="startDrag(event,'contact')">
+    <span style="font-size:14px">✉️</span>
+    <span class="titlebar-title">Contacto — marcthefennec</span>
+    <div class="titlebar-buttons">
+      <button class="tbtn tbtn-min" onclick="minimizeWindow('contact')">_</button>
+      <button class="tbtn tbtn-max">□</button>
+      <button class="tbtn tbtn-close" onclick="closeWindow('contact')">✕</button>
+    </div>
+  </div>
+  <div class="win-body">
+    <!-- EDITA TUS REDES AQUI -->
+    <div class="contact-row">
+      <span class="contact-icon">🐙</span>
+      <div class="contact-info">
+        <div class="contact-label">GitHub</div>
+        <a href="https://github.com/MarcTheFennec" target="_blank">@MarcTheFennec</a>
+      </div>
+    </div>
+    <div class="contact-row">
+      <span class="contact-icon">🐦</span>
+      <div class="contact-info">
+        <div class="contact-label">Twitter / X</div>
+        <a href="https://x.com/MarcTheFennec" target="_blank">@MarcTheFennec</a>
+      </div>
+    </div>
+  </div>
+  <div class="win-statusbar"><span>4 contactos</span><span>💜</span></div>
+</div>
+
+<!-- BLOG -->
+<div class="window" id="win-blog" style="top:90px;left:130px;width:460px;">
+  <div class="titlebar" onmousedown="startDrag(event,'blog')">
+    <span style="font-size:14px">📝</span>
+    <span class="titlebar-title">Blog — marcthefennec</span>
+    <div class="titlebar-buttons">
+      <button class="tbtn tbtn-min" onclick="minimizeWindow('blog')">_</button>
+      <button class="tbtn tbtn-max">□</button>
+      <button class="tbtn tbtn-close" onclick="closeWindow('blog')">✕</button>
+    </div>
+  </div>
+  <div class="win-menubar"><span>Posts</span><span>Ver</span></div>
+  <div class="win-body" id="blog-body"><p style="font-size:7px;color:#888;">Cargando...</p></div>
+  <div class="win-statusbar"><span id="blog-count">—</span><span>data/blog.json</span></div>
+</div>
+
+<!-- POST INDIVIDUAL -->
+<div class="window" id="win-post" style="top:110px;left:200px;width:440px;">
+  <div class="titlebar" onmousedown="startDrag(event,'post')">
+    <span style="font-size:14px">📄</span>
+    <span class="titlebar-title" id="post-title">Post</span>
+    <div class="titlebar-buttons">
+      <button class="tbtn tbtn-min" onclick="minimizeWindow('post')">_</button>
+      <button class="tbtn tbtn-max">□</button>
+      <button class="tbtn tbtn-close" onclick="closeWindow('post')">✕</button>
+    </div>
+  </div>
+  <div class="win-body" id="post-body"></div>
+  <div class="win-statusbar"><span id="post-date">—</span><span>blog</span></div>
+</div>
+
+<!-- TASKBAR -->
+<div id="taskbar">
+  <button id="start-btn" onclick="toggleStartMenu()">
+    <span style="font-size:18px">💜</span> inicio
+  </button>
+  <div class="taskbar-sep"></div>
+  <button class="task-btn" id="task-about"    onclick="toggleWindow('about')">🦊 Sobre mi</button>
+  <button class="task-btn" id="task-projects" onclick="toggleWindow('projects')">📁 Proyectos</button>
+  <button class="task-btn" id="task-blog"     onclick="toggleWindow('blog')">📝 Blog</button>
+  <button class="task-btn" id="task-updates"  onclick="toggleWindow('updates')">📰 Updates</button>
+  <button class="task-btn" id="task-contact"  onclick="toggleWindow('contact')">✉️ Contacto</button>
+  <button class="task-btn" id="task-post"     onclick="toggleWindow('post')">📄 Post</button>
+  <div id="taskbar-clock">--:--<br>--/--/--</div>
+</div>
+
+<!-- START MENU -->
+<div id="start-menu">
+  <div class="sm-header">
+    <span class="sm-avatar">🦊</span>
+    <span class="sm-name">MarcTheFennec</span>
+  </div>
+  <div class="sm-items">
+    <div class="sm-item" onclick="openWindow('about');closeStartMenu()"><span class="sm-item-icon">🦊</span> Sobre mi</div>
+    <div class="sm-item" onclick="openWindow('projects');closeStartMenu()"><span class="sm-item-icon">📁</span> Proyectos</div>
+    <div class="sm-item" onclick="openWindow('blog');closeStartMenu()"><span class="sm-item-icon">📝</span> Blog</div>
+    <div class="sm-item" onclick="openWindow('updates');closeStartMenu()"><span class="sm-item-icon">📰</span> Updates</div>
+    <div class="sm-item" onclick="openWindow('contact');closeStartMenu()"><span class="sm-item-icon">✉️</span> Contacto</div>
+    <div class="sm-sep"></div>
+    <div class="sm-item" onclick="window.open('https://github.com/marcthefennec','_blank');closeStartMenu()"><span class="sm-item-icon">🐙</span> Mi GitHub</div>
+  </div>
+</div>
+
+<script>
+const wins = ['about','projects','updates','contact','blog','post'];
+
+function openWindow(id) {
+  const w = document.getElementById('win-'+id);
+  if (!w) return;
+  w.classList.add('open');
+  bringToFront(id);
+  const tb = document.getElementById('task-'+id);
+  if (tb) tb.classList.add('visible','active-task');
+}
+
+function closeWindow(id) {
+  const w = document.getElementById('win-'+id);
+  if (!w) return;
+  w.classList.remove('open');
+  const tb = document.getElementById('task-'+id);
+  if (tb) tb.classList.remove('visible','active-task');
+}
+
+function minimizeWindow(id) {
+  const w = document.getElementById('win-'+id);
+  if (!w) return;
+  w.classList.remove('open');
+  const tb = document.getElementById('task-'+id);
+  if (tb) tb.classList.remove('active-task');
+}
+
+function toggleWindow(id) {
+  const w = document.getElementById('win-'+id);
+  if (!w) return;
+  if (!w.classList.contains('open')) { openWindow(id); return; }
+  if (w.classList.contains('active')) minimizeWindow(id);
+  else bringToFront(id);
+}
+
+function bringToFront(id) {
+  wins.forEach(wid => {
+    document.getElementById('win-'+wid)?.classList.remove('active');
+    document.getElementById('task-'+wid)?.classList.remove('active-task');
+  });
+  const w = document.getElementById('win-'+id);
+  if (w) w.classList.add('active');
+  const tb = document.getElementById('task-'+id);
+  if (tb) tb.classList.add('active-task');
+}
+
+wins.forEach(id => {
+  document.getElementById('win-'+id)
+    ?.addEventListener('mousedown', () => bringToFront(id));
+});
+
+let drag = null, ox = 0, oy = 0;
+function startDrag(e, id) {
+  bringToFront(id);
+  drag = document.getElementById('win-'+id);
+  ox = e.clientX - drag.offsetLeft;
+  oy = e.clientY - drag.offsetTop;
+  e.preventDefault();
+}
+document.addEventListener('mousemove', e => {
+  if (!drag) return;
+  drag.style.left = Math.max(0, Math.min(window.innerWidth - drag.offsetWidth, e.clientX - ox)) + 'px';
+  drag.style.top  = Math.max(0, Math.min(window.innerHeight - drag.offsetHeight - 4, e.clientY - oy)) + 'px';
+});
+document.addEventListener('mouseup', () => drag = null);
+
+function toggleStartMenu() { document.getElementById('start-menu').classList.toggle('open'); }
+function closeStartMenu()  { document.getElementById('start-menu').classList.remove('open'); }
+document.addEventListener('click', e => {
+  if (!e.target.closest('#start-menu') && !e.target.closest('#start-btn')) closeStartMenu();
+});
+
+function updateClock() {
+  const n = new Date();
+  const pad = x => String(x).padStart(2,'0');
+  document.getElementById('taskbar-clock').innerHTML =
+    pad(n.getHours())+':'+pad(n.getMinutes())+'<br>'+pad(n.getDate())+'/'+pad(n.getMonth()+1)+'/'+String(n.getFullYear()).slice(2);
+  const ut = document.getElementById('upd-time');
+  if (ut) ut.textContent = pad(n.getHours())+':'+pad(n.getMinutes());
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+async function loadNews() {
+  try {
+    const r = await fetch('data/news.json');
+    const items = await r.json();
+    const body = document.getElementById('news-body');
+    let html = '';
+    items.forEach(function(n) {
+      html += '<div class="update-item"><span class="update-date">'+n.fecha+'</span><span>'+n.texto+'</span></div>';
+    });
+    html += '<div class="px-divider"></div><p style="font-size:7px;color:#888;">Edita data/news.json para actualizar.</p>';
+    body.innerHTML = html;
+    document.getElementById('news-count').textContent = items.length + ' updates';
+  } catch(e) {
+    document.getElementById('news-body').innerHTML = '<p style="font-size:7px;color:red;">Error: abre con Live Server, no directo.</p>';
+  }
+}
+
+async function loadProjects() {
+  try {
+    const r = await fetch('data/projects.json');
+    const items = await r.json();
+    const body = document.getElementById('projects-body');
+    let html = '';
+    items.forEach(function(p) {
+      html += '<div class="project-item"><h3>'+(p.emoji||'📁')+' '+p.nombre+'</h3><p>'+p.descripcion+'</p>';
+      if (p.url) html += '<a href="'+p.url+'" target="_blank" class="project-link">'+(p.link_texto||'Ver proyecto →')+'</a>';
+      html += '</div>';
+    });
+    html += '<div class="px-divider"></div><p style="font-size:7px;color:#888;">Edita data/projects.json para actualizar.</p>';
+    body.innerHTML = html;
+    document.getElementById('projects-count').textContent = items.length + ' objetos';
+  } catch(e) {
+    document.getElementById('projects-body').innerHTML = '<p style="font-size:7px;color:red;">Error: abre con Live Server, no directo.</p>';
+  }
+}
+
+async function loadBlog() {
+  try {
+    const r = await fetch('data/blog.json');
+    const posts = await r.json();
+    window._blogPosts = posts;
+    const body = document.getElementById('blog-body');
+    let html = '';
+    posts.forEach(function(p) {
+      html += '<div class="project-item" style="cursor:pointer" onclick="openPost('+p.id+')">';
+      html += '<h3>'+(p.emoji||'📝')+' '+p.titulo+'</h3>';
+      html += '<p style="color:#888;font-size:6px;">'+p.fecha+'</p>';
+      html += '<p style="margin-top:4px;">'+p.resumen+'</p>';
+      html += '<span class="project-link">Leer mas →</span></div>';
+    });
+    html += '<div class="px-divider"></div><p style="font-size:7px;color:#888;">Edita data/blog.json para actualizar.</p>';
+    body.innerHTML = html;
+    document.getElementById('blog-count').textContent = posts.length + ' posts';
+  } catch(e) {
+    document.getElementById('blog-body').innerHTML = '<p style="font-size:7px;color:red;">Error: abre con Live Server, no directo.</p>';
+  }
+}
+
+function openPost(id) {
+  const post = (window._blogPosts || []).find(function(p){ return p.id === id; });
+  if (!post) return;
+  document.getElementById('post-title').textContent = (post.emoji||'📝') + ' ' + post.titulo;
+  document.getElementById('post-date').textContent = post.fecha;
+  document.getElementById('post-body').innerHTML =
+    '<h2 style="font-size:9px;color:var(--p2);margin-bottom:10px;">'+(post.emoji||'')+' '+post.titulo+'</h2>'+
+    '<p style="font-size:6px;color:#888;margin-bottom:10px;">'+post.fecha+'</p>'+
+    '<div class="px-divider"></div>'+
+    '<p style="font-size:7px;line-height:2;margin-top:10px;">'+post.contenido+'</p>';
+  openWindow('post');
+}
+
+window.addEventListener('load', function() {
+  loadNews();
+  loadProjects();
+  loadBlog();
+  openWindow('about');
+  setTimeout(function(){ openWindow('updates'); }, 150);
+});
+</script>
+</body>
+</html>
