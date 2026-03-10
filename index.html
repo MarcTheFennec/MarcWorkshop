@@ -353,7 +353,7 @@ updateClock();
 
 async function loadNews() {
   try {
-    const r = await fetch('MarcWorkshop/data/news.json');
+    const r = await fetch('data/news.json');
     const items = await r.json();
     const body = document.getElementById('news-body');
     let html = '';
@@ -370,7 +370,7 @@ async function loadNews() {
 
 async function loadProjects() {
   try {
-    const r = await fetch('MarcWorkshop/data/projects.json');
+    const r = await fetch('data/projects.json');
     const items = await r.json();
     const body = document.getElementById('projects-body');
     let html = '';
@@ -389,7 +389,7 @@ async function loadProjects() {
 
 async function loadBlog() {
   try {
-    const r = await fetch('MarcWorkshop/data/blog.json');
+    const r = await fetch('data/blog.json');
     const posts = await r.json();
     window._blogPosts = posts;
     const body = document.getElementById('blog-body');
